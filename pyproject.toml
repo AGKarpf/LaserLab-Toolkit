@@ -7,7 +7,7 @@ name = "laserlab-toolkit"
 dynamic = ["version"]
 description = "LaserLab toolkit: diode chains (Maiman/Aerodiode), APG1780DA, dual EOM and Spectrum AWG with a plugin registry for building custom PyQt6 GUIs."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Christian Stock" }]
 dependencies = [
@@ -15,6 +15,7 @@ dependencies = [
     "pyserial>=3.5,<4",
     "numpy>=1.24,<3",
     "matplotlib>=3.7,<4",
+    "tomli>=2; python_version < \"3.11\"",
     "maiman-drivers[gui] @ git+https://github.com/AGKarpf/Maiman-Treiber-Software.git",
     "aerodiode-driver[gui] @ git+https://github.com/AGKarpf/Aerodiode-Treiber-Software.git",
     "apg1780da[gui] @ git+https://github.com/AGKarpf/apg1780da.git",

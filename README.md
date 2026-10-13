@@ -11,7 +11,7 @@ the Spectrum AWG and an additional seed/pump laser with Maiman SF8 TEC drivers.
 
 ## Installation
 
-Python 3.11 or newer. All drivers are separate repositories and are installed
+Python 3.10 or newer. All drivers are separate repositories and are installed
 automatically as dependencies:
 
 | Package (import) | Repository |

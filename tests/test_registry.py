@@ -6,9 +6,9 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from srp_controller import registry
-from srp_controller.config import ConfigError, _build_stage
-from srp_controller.registry import Registry, UnknownComponentError
+from laserlab import registry
+from laserlab.config import ConfigError, _build_stage
+from laserlab.registry import Registry, UnknownComponentError
 
 
 def test_builtin_types_registered():
@@ -55,7 +55,7 @@ def test_custom_registry_and_duplicates():
 
 def test_plugin_types_usable_in_config(monkeypatch):
     reg = Registry()
-    from srp_controller import builtin
+    from laserlab import builtin
     builtin.register(reg)
     seen = []
     reg.add("stage", "plugin_stage",

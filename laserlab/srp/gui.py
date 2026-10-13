@@ -17,8 +17,9 @@ from PyQt6.QtWidgets import QLayout, QSizePolicy, QLabel
 from maiman_drivers.gui import LaserChainWidget
 from apg1780da.gui import ApgDeviceWidget
 
-from .laser import Laser
-from .eom_widget import EomWidget
+from eom_controller.gui import EomWidget
+
+from ..laser import Laser
 from .awg_widget import AwgPanel
 from .connection_widget import ConnectionPanel
 

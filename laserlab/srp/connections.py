@@ -15,7 +15,7 @@ from pathlib import Path
 from serial.tools import list_ports
 from maiman_drivers import SF8150T
 from maiman_drivers.laser import AdjustableTecLaserStage, LaserChain
-from .laser import Laser
+from ..laser import Laser
 
 
 def read_connection_settings(config_path="config.toml"):

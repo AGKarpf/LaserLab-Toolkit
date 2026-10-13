@@ -23,7 +23,7 @@ from apg1780da.mock import MockAPG1780DA
 from maiman_drivers.laser import LaserChain, TecLaserStage, DcLaserStage, AdjustableTecLaserStage
 from eom_controller import DualEOMController, EomChannel, MockDualEOMController, SharedEom
 
-from .awg import AwgController, AwgSettings
+from .srp.awg import AwgController, AwgSettings
 
 #: TEC setpoint for all TEC drivers: 25 °C.
 TEC_TEMPERATURE_C = 25.0
@@ -185,7 +185,7 @@ def eom_widget(obj, **kwargs):
 
 
 def awg_widget(controller, **kwargs):
-    from .awg_widget import AwgPanel
+    from .srp.awg_widget import AwgPanel
     return AwgPanel(controller, **kwargs)
 
 

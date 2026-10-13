@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "srp-controller"
+name = "laserlab-toolkit"
 dynamic = ["version"]
-description = "SRP laser controller toolkit: diode chains (Maiman/Aerodiode), APG1780DA, dual EOM and Spectrum AWG with a plugin registry for building custom PyQt6 GUIs."
+description = "LaserLab toolkit: diode chains (Maiman/Aerodiode), APG1780DA, dual EOM and Spectrum AWG with a plugin registry for building custom PyQt6 GUIs."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -28,16 +28,16 @@ hardware = ["spcm_core"]
 test = ["pytest>=7"]
 
 [project.gui-scripts]
-srp-controller = "srp_controller.__main__:main"
+laserlab = "laserlab.__main__:main"
 
 [tool.setuptools]
-packages = ["srp_controller"]
+packages = ["laserlab", "laserlab.srp"]
 
 [tool.setuptools.package-data]
-srp_controller = ["defaults/*.toml", "defaults/*.ini"]
+"laserlab.srp" = ["defaults/*.toml", "defaults/*.ini"]
 
 [tool.setuptools.dynamic]
-version = { attr = "srp_controller.__version__" }
+version = { attr = "laserlab.__version__" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

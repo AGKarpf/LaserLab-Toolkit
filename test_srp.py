@@ -3,12 +3,12 @@ Verify the legacy two-laser fixture, configuration loading, chain dependencies,
 TEC protection, APG controls, shared EOM behavior and AWG waveform updates.
 Additional SF8 connection/GUI cases are covered in tests/test_sf8.py."""
 
-import srp_controller  # noqa: F401
+import laserlab  # noqa: F401
 
 from maiman_drivers.laser import (
     TecLaserStage, DcLaserStage, ChainDependencyError, TecNotRunningError,
 )
-from srp_controller.laser import build_lasers_mock
+from laserlab.laser import build_lasers_mock
 
 
 _passed = 0
@@ -145,7 +145,7 @@ def test_eom(lasers):
 def test_chaining_reported():
     """Verify that the first stage of each existing laser can be enabled."""
     print("\n== Chain: enable the first stage of each laser ==")
-    from srp_controller.config import load_lasers
+    from laserlab.config import load_lasers
     from maiman_drivers.laser import TecLaserStage, DcLaserStage
     l1, l2 = load_lasers("config.toml", force_mock=True)[:2]
 
@@ -166,7 +166,7 @@ def test_chaining_reported():
 def test_tec_25c():
     """Verify TEC startup at connection and a 25 °C setpoint."""
     print("\n== TEC active at connection, 25 °C ==")
-    from srp_controller.config import load_lasers
+    from laserlab.config import load_lasers
     l1, _ = load_lasers("config.toml", force_mock=True)[:2]
 
     # 1064 nm stage 0: Maiman TEC
@@ -185,11 +185,11 @@ def test_tec_25c():
 def test_awg():
     print("\n== AWG (SRP sequence, simulated) ==")
     import numpy as np
-    from srp_controller.config import load_awg
+    from laserlab.config import load_awg
     awg = load_awg("config.toml", force_mock=True)
     check("AWG loaded from configuration", awg is not None and awg.use_mock)
 
-    from srp_controller.awg import _pulse_train
+    from laserlab.srp.awg import _pulse_train
 
     # Pump phase 0, Stokes phase 4 (constant offset across the buffer).
     awg.set_pump_phase(0)
@@ -234,7 +234,7 @@ def test_awg_double_buffer():
     sys.path.insert(0, str(Path(__file__).resolve().parent / "tests" / "stubs"))
     os.environ["SPECTRUM_AWG_BACKEND"] = "pyspcm"
     print("\n== AWG: Live update without restart (double buffer) ==")
-    from srp_controller.awg import AwgController, AwgSettings
+    from laserlab.srp.awg import AwgController, AwgSettings
 
     class FakeCard:
         def __init__(self):

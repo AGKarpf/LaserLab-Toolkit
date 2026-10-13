@@ -12,9 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import pytest
-import srp_controller
-from srp_controller import connections
-from srp_controller.config import load_lasers, load_awg
+import laserlab
+from laserlab.srp import connections
+from laserlab.config import load_lasers, load_awg
 from maiman_drivers.driver import MaimanDriver, SerialNumberMismatch
 from maiman_drivers.mock import FakeMaimanSerial, MockSF8150T
 from maiman_drivers.laser import ChainDependencyError, TecNotRunningError, AdjustableTecLaserStage
@@ -23,7 +23,7 @@ from maiman_drivers.laser import ChainDependencyError, TecNotRunningError, Adjus
 @pytest.fixture(autouse=True)
 def fast_mock_transport():
     """Suppress only mock driver delays; never connect to physical hardware."""
-    with patch("maiman_drivers.driver.time.sleep"), patch("srp_controller.builtin.SF8150T", side_effect=AssertionError("Real hardware forbidden")):
+    with patch("maiman_drivers.driver.time.sleep"), patch("laserlab.builtin.SF8150T", side_effect=AssertionError("Real hardware forbidden")):
         yield
 
 
@@ -185,7 +185,7 @@ def app():
 
 
 def test_gui_controls_and_awg_dependencies(app, tmp_path):
-    from srp_controller.gui import CombinedWindow
+    from laserlab.srp.gui import CombinedWindow
     from maiman_drivers.gui import AdjustableTecStageWidget
     lasers=load_lasers(force_mock=True)
     awg=load_awg(force_mock=True)
@@ -216,8 +216,8 @@ def test_gui_controls_and_awg_dependencies(app, tmp_path):
 
 
 def test_manual_gui_connection_joins_awg_gate(app, definition, simulated_boards, tmp_path, monkeypatch):
-    from srp_controller.gui import CombinedWindow
-    import srp_controller.connection_widget as widget
+    from laserlab.srp.gui import CombinedWindow
+    import laserlab.srp.connection_widget as widget
     monkeypatch.setattr(widget,"available_ports",lambda: [("COM21","COM21 — seed USB"),("COM22","COM22 — pump USB")])
     window=CombinedWindow([],load_awg(force_mock=True),connection_settings=([definition],set(),tmp_path/"connections.json"))
     panel=window.connection_panels[0]

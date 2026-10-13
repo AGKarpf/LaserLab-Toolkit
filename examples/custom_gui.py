@@ -1,4 +1,4 @@
-"""Build your own GUI from srp_controller components (simulated devices).
+"""Build your own GUI from laserlab components (simulated devices).
 Run: py examples/custom_gui.py   (drop mock=True / use real ports for hardware)
 
 Every device type and its widget is looked up by name in the plugin registry,
@@ -6,8 +6,8 @@ so new types from installed plugins work the same way."""
 
 import sys
 
-import srp_controller            # import before PyQt6 (EOM DLL / Qt runtime order)
-from srp_controller import registry
+import laserlab            # import before PyQt6 (EOM DLL / Qt runtime order)
+from laserlab import registry
 
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
 

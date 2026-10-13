@@ -1,4 +1,4 @@
-"""Start the combined SRP GUI: py -m srp_controller [--config config.toml] [--mock].
+"""Start the combined SRP GUI: py -m laserlab.srp [--config config.toml] [--mock].
 Without --config, ./config.toml is used, else the packaged default configuration.
 --init copies config.toml and eom.ini into the current folder for editing.
 Hardware mode follows [general] use_mock; deferred drivers connect from the GUI.
@@ -49,7 +49,7 @@ def _preload_eom_dll(config_path: Path) -> None:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog="srp_controller", description=__doc__)
+    parser = argparse.ArgumentParser(prog="laserlab.srp", description=__doc__)
     parser.add_argument("--config", type=Path, default=None,
                         help="configuration file (default: ./config.toml, else the packaged one)")
     parser.add_argument("--init", action="store_true",
@@ -64,7 +64,7 @@ def main(argv=None) -> int:
     if not args.mock:
         _preload_eom_dll(config)
 
-    from .config import load_awg, load_lasers
+    from ..config import load_awg, load_lasers
     from .connections import read_connection_settings
 
     force_mock = True if args.mock else None

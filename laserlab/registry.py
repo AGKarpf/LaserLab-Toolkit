@@ -16,9 +16,9 @@ widget(obj, **kwargs) factory returning a PyQt6 widget for that object. Qt is
 only imported when a widget is requested.
 
 Third-party packages add component types through the entry-point group
-"srp_controller.plugins"; each entry point is a callable register(registry):
+"laserlab.plugins"; each entry point is a callable register(registry):
 
-    [project.entry-points."srp_controller.plugins"]
+    [project.entry-points."laserlab.plugins"]
     my_laser = "my_package.srp_plugin:register"
 """
 
@@ -30,7 +30,7 @@ from importlib.metadata import entry_points
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
 
 #: Entry-point group scanned for external plugins.
-PLUGIN_GROUP = "srp_controller.plugins"
+PLUGIN_GROUP = "laserlab.plugins"
 
 BuildFactory = Callable[[Mapping[str, Any], bool], Any]
 WidgetFactory = Callable[..., Any]
@@ -85,7 +85,7 @@ class Registry:
             try:
                 ep.load()(self)
             except Exception as exc:
-                warnings.warn(f"srp_controller plugin '{ep.name}' ({ep.value}) "
+                warnings.warn(f"laserlab plugin '{ep.name}' ({ep.value}) "
                               f"failed to load: {exc}", RuntimeWarning, stacklevel=2)
                 continue
             loaded.append(ep.name)

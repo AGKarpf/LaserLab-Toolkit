@@ -12,9 +12,9 @@ from typing import List, Optional
 
 from maiman_drivers.laser import LaserChain
 
-from .awg import AwgController
+from .srp.awg import AwgController
 from .builtin import TEC_TEMPERATURE_C, _activate_tec  # noqa: F401 (re-exported)
-from .eom import EomChannel, SharedEom
+from eom_controller import EomChannel, SharedEom
 from .laser import Laser
 from .registry import Registry, UnknownComponentError, default_registry
 

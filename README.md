@@ -1,9 +1,13 @@
-# SRP Controller
+# LaserLab-Toolkit
 
-Control the existing 1064 nm and 1550 nm lasers, shared dual EOM controller,
-APG pulse generators and Spectrum AWG, plus an additional seed/pump laser using
-Maiman SF8 TEC drivers. The combined GUI, configuration, core source code and
-shared Maiman/APG widgets and Spectrum library are in English.
+Python toolkit (`import laserlab`) for the AG Karpf laser setups: Maiman and
+Aerodiode diode-driver chains, APG1780DA pulse generators, the shared dual EOM
+controller and the Spectrum M4i AWG. Every device type and its PyQt6 widget is
+available through a plugin registry for building your own GUIs.
+
+Included application: the **SRP controller** (`laserlab.srp`), which controls
+the 1064 nm and 1550 nm lasers, the shared dual EOM, the APG pulse generators,
+the Spectrum AWG and an additional seed/pump laser with Maiman SF8 TEC drivers.
 
 ## Installation
 
@@ -19,9 +23,9 @@ automatically as dependencies:
 | `spectrum_awg` | [spectrum_m4i_awg](https://github.com/AGKarpf/spectrum_m4i_awg) |
 
 ```powershell
-py -m pip install "srp-controller @ git+https://github.com/AGKarpf/New_Controller.git"
+py -m pip install "laserlab-toolkit @ git+https://github.com/AGKarpf/LaserLab-Toolkit.git"
 # with the Spectrum card binding (spcm_core):
-py -m pip install "srp-controller[hardware] @ git+https://github.com/AGKarpf/New_Controller.git"
+py -m pip install "laserlab-toolkit[hardware] @ git+https://github.com/AGKarpf/LaserLab-Toolkit.git"
 ```
 
 Only Python and Git need to be installed; all drivers, PyQt6 and the EOM DLL
@@ -33,15 +37,15 @@ drivers). Development checkout: `py -m pip install -e .[test]`.
 ## Start
 
 ```powershell
-srp-controller --mock          # simulated devices, all laser panels (no console)
-py -m srp_controller --mock    # same, with console output
-py -m srp_controller --init    # copy config.toml + eom.ini here to adapt ports/settings
-py -m srp_controller           # uses ./config.toml, else the packaged default
-py -m srp_controller --config D:/lab/config.toml
+laserlab --mock                # simulated devices, all laser panels (no console)
+py -m laserlab --mock          # same, with console output
+py -m laserlab --init          # copy config.toml + eom.ini here to adapt ports/settings
+py -m laserlab                 # uses ./config.toml, else the packaged default
+py -m laserlab --config D:/lab/config.toml
 ```
 
 In a development checkout, `py demo.py` / `py main.py` use the `config.toml`
-next to them. The packaged default lives in `srp_controller/defaults/`. Hardware
+next to them. The packaged default lives in `laserlab/srp/defaults/`. Hardware
 mode requires the NI-DAQmx runtime (EOM) and the Spectrum drivers (AWG).
 
 ## Using the components in your own GUI (plugin registry)
@@ -50,8 +54,8 @@ Every device type and its PyQt6 widget is registered by kind and name and can
 be built from the same parameter tables as `config.toml`:
 
 ```python
-import srp_controller                     # import before PyQt6 (EOM DLL / Qt runtime order)
-from srp_controller import registry
+import laserlab                           # import before PyQt6 (EOM DLL / Qt runtime order)
+from laserlab import registry
 
 chain = registry.build("chain", "laser_chain", {"name": "My laser", "stage": [
     {"type": "maiman_tec", "port": "COM5", "current_max_a": 0.5, "adjustable_current": True},
@@ -75,12 +79,12 @@ widget = registry.create_widget("chain", "laser_chain", chain)   # any QWidget l
 example is [`examples/custom_gui.py`](examples/custom_gui.py).
 
 **Adding your own device types:** another package registers a function in the
-entry-point group `srp_controller.plugins`; it is called with the registry on
+entry-point group `laserlab.plugins`; it is called with the registry on
 first use, and its types are then also usable as `type = "..."` in `config.toml`:
 
 ```toml
 # pyproject.toml of your plugin package
-[project.entry-points."srp_controller.plugins"]
+[project.entry-points."laserlab.plugins"]
 my_driver = "my_package.srp_plugin:register"
 ```
 
@@ -151,12 +155,12 @@ TECs remain enabled, as in the original controller.
 ## Files
 
 - `config.toml`: devices, ports and AWG settings; `eom.ini`: dual EOM parameters.
-- `srp_controller/registry.py`: plugin registry (kinds, build/widget factories, entry points).
-- `srp_controller/builtin.py`: built-in component types and TEC activation.
-- `srp_controller/config.py`: builds lasers/AWG from `config.toml` via the registry.
-- `srp_controller/connections.py`, `connection_widget.py`: manual port selection and identity checks.
-- `srp_controller/gui.py`: combined panels and AWG gating; `awg.py`/`awg_widget.py`: SRP waveform.
-- `srp_controller/__main__.py`: command-line start.
+- `laserlab/registry.py`: plugin registry (kinds, build/widget factories, entry points).
+- `laserlab/builtin.py`: built-in component types and TEC activation.
+- `laserlab/config.py`: builds lasers/AWG from `config.toml` via the registry.
+- `laserlab/srp/connections.py`, `connection_widget.py`: manual port selection and identity checks.
+- `laserlab/srp/gui.py`: combined panels and AWG gating; `awg.py`/`awg_widget.py`: SRP waveform.
+- `laserlab/srp/__main__.py`: command-line start (`laserlab`, `py -m laserlab`, `py -m laserlab.srp`).
 - `test_srp.py`, `tests/`: hardware-free regression tests (`tests/stubs`: Spectrum driver stubs).
 
 ## Test without hardware

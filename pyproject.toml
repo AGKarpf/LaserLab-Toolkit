@@ -15,11 +15,11 @@ dependencies = [
     "pyserial>=3.5,<4",
     "numpy>=1.24,<3",
     "matplotlib>=3.7,<4",
-    "maiman-drivers[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/Maiman-Treiber-Software.git",
-    "aerodiode-driver[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/Aerodiode-Treiber-Software.git",
-    "apg1780da[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/apg1780da.git",
-    "eom-controller[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/EOM-Controller.git",
-    "spectrum-awg @ git+https://github.com/GITHUB_USER_PLACEHOLDER/spectrum_m4i_awg.git",
+    "maiman-drivers[gui] @ git+https://github.com/AGKarpf/Maiman-Treiber-Software.git",
+    "aerodiode-driver[gui] @ git+https://github.com/AGKarpf/Aerodiode-Treiber-Software.git",
+    "apg1780da[gui] @ git+https://github.com/AGKarpf/apg1780da.git",
+    "eom-controller[gui] @ git+https://github.com/AGKarpf/EOM-Controller.git",
+    "spectrum-awg @ git+https://github.com/AGKarpf/spectrum_m4i_awg.git",
 ]
 
 [project.optional-dependencies]

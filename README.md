@@ -12,14 +12,14 @@ automatically as dependencies:
 
 | Package (import) | Repository |
 |---|---|
-| `maiman_drivers` | [Maiman-Treiber-Software](https://github.com/GITHUB_USER_PLACEHOLDER/Maiman-Treiber-Software) |
-| `aerodiode_driver` | [Aerodiode-Treiber-Software](https://github.com/GITHUB_USER_PLACEHOLDER/Aerodiode-Treiber-Software) |
-| `apg1780da` | [apg1780da](https://github.com/GITHUB_USER_PLACEHOLDER/apg1780da) |
-| `eom_controller` | [EOM-Controller](https://github.com/GITHUB_USER_PLACEHOLDER/EOM-Controller) (C++ DLL + Python, DLL bundled) |
-| `spectrum_awg` | [spectrum_m4i_awg](https://github.com/GITHUB_USER_PLACEHOLDER/spectrum_m4i_awg) |
+| `maiman_drivers` | [Maiman-Treiber-Software](https://github.com/AGKarpf/Maiman-Treiber-Software) |
+| `aerodiode_driver` | [Aerodiode-Treiber-Software](https://github.com/AGKarpf/Aerodiode-Treiber-Software) |
+| `apg1780da` | [apg1780da](https://github.com/AGKarpf/apg1780da) |
+| `eom_controller` | [EOM-Controller](https://github.com/AGKarpf/EOM-Controller) (C++ DLL + Python, DLL bundled) |
+| `spectrum_awg` | [spectrum_m4i_awg](https://github.com/AGKarpf/spectrum_m4i_awg) |
 
 ```powershell
-py -m pip install "srp-controller[hardware] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/New_Controller.git"
+py -m pip install "srp-controller[hardware] @ git+https://github.com/AGKarpf/New_Controller.git"
 ```
 
 `[hardware]` adds `spcm_core` for the Spectrum card (needs the native SPCM

@@ -36,8 +36,8 @@ Update to the latest version:
 py -m pip install --upgrade --force-reinstall https://github.com/AGKarpf/LaserLab-Toolkit/archive/refs/heads/main.zip
 ```
 
-`[hardware]` adds `spcm_core` for the Spectrum card (needs the native SPCM
-drivers). Development checkout: `py -m pip install -e .[test]`.
+The Spectrum binding needs the native SPCM drivers. Development checkout:
+`py -m pip install -e .[test]` (Git needed only for developing).
 
 ## Start
 

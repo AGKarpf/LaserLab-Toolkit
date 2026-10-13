@@ -33,6 +33,9 @@ srp-controller = "srp_controller.__main__:main"
 [tool.setuptools]
 packages = ["srp_controller"]
 
+[tool.setuptools.package-data]
+srp_controller = ["defaults/*.toml", "defaults/*.ini"]
+
 [tool.setuptools.dynamic]
 version = { attr = "srp_controller.__version__" }
 

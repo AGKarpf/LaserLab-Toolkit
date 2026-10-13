@@ -1,13 +1,36 @@
 """Start the combined SRP GUI: py -m srp_controller [--config config.toml] [--mock].
+Without --config, ./config.toml is used, else the packaged default configuration.
+--init copies config.toml and eom.ini into the current folder for editing.
 Hardware mode follows [general] use_mock; deferred drivers connect from the GUI.
 The EOM DLL is preloaded before Qt is imported (see eom_controller.preload_dll)."""
 
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 import tomllib
 from pathlib import Path
+
+#: Configuration shipped with the package (config.toml + eom.ini).
+DEFAULTS_DIR = Path(__file__).resolve().parent / "defaults"
+
+
+def _default_config() -> Path:
+    local = Path("config.toml")
+    return local if local.exists() else DEFAULTS_DIR / "config.toml"
+
+
+def _init_config(target: Path) -> int:
+    """Copy the packaged config.toml and eom.ini into target (never overwrite)."""
+    for name in ("config.toml", "eom.ini"):
+        dest = target / name
+        if dest.exists():
+            print(f"{dest} exists, not overwritten.")
+        else:
+            shutil.copyfile(DEFAULTS_DIR / name, dest)
+            print(f"Created {dest}")
+    return 0
 
 
 def _preload_eom_dll(config_path: Path) -> None:
@@ -27,12 +50,16 @@ def _preload_eom_dll(config_path: Path) -> None:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="srp_controller", description=__doc__)
-    parser.add_argument("--config", type=Path, default=Path("config.toml"),
-                        help="configuration file (default: ./config.toml)")
+    parser.add_argument("--config", type=Path, default=None,
+                        help="configuration file (default: ./config.toml, else the packaged one)")
+    parser.add_argument("--init", action="store_true",
+                        help="copy config.toml and eom.ini into the current folder and exit")
     parser.add_argument("--mock", action="store_true",
                         help="simulate all devices, no hardware connections")
     args = parser.parse_args(argv)
-    config = args.config.resolve()
+    if args.init:
+        return _init_config(Path.cwd())
+    config = (args.config or _default_config()).resolve()
 
     if not args.mock:
         _preload_eom_dll(config)

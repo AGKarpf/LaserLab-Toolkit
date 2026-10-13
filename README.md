@@ -19,8 +19,13 @@ automatically as dependencies:
 | `spectrum_awg` | [spectrum_m4i_awg](https://github.com/AGKarpf/spectrum_m4i_awg) |
 
 ```powershell
+py -m pip install "srp-controller @ git+https://github.com/AGKarpf/New_Controller.git"
+# with the Spectrum card binding (spcm_core):
 py -m pip install "srp-controller[hardware] @ git+https://github.com/AGKarpf/New_Controller.git"
 ```
+
+Only Python and Git need to be installed; all drivers, PyQt6 and the EOM DLL
+come along automatically.
 
 `[hardware]` adds `spcm_core` for the Spectrum card (needs the native SPCM
 drivers). Development checkout: `py -m pip install -e .[test]`.
@@ -28,12 +33,15 @@ drivers). Development checkout: `py -m pip install -e .[test]`.
 ## Start
 
 ```powershell
-py -m srp_controller --mock                 # simulated devices, all laser panels
-py -m srp_controller --config config.toml   # follows [general] use_mock
+srp-controller --mock          # simulated devices, all laser panels (no console)
+py -m srp_controller --mock    # same, with console output
+py -m srp_controller --init    # copy config.toml + eom.ini here to adapt ports/settings
+py -m srp_controller           # uses ./config.toml, else the packaged default
+py -m srp_controller --config D:/lab/config.toml
 ```
 
-`py demo.py` / `py main.py` do the same with the `config.toml` next to them;
-after installation `srp-controller` starts the GUI without a console. Hardware
+In a development checkout, `py demo.py` / `py main.py` use the `config.toml`
+next to them. The packaged default lives in `srp_controller/defaults/`. Hardware
 mode requires the NI-DAQmx runtime (EOM) and the Spectrum drivers (AWG).
 
 ## Using the components in your own GUI (plugin registry)

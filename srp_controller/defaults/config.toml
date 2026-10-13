@@ -1,0 +1,122 @@
+# =============================================================================
+# SRP Controller — configuration
+#
+# COM ports and driver parameters are defined here.
+# Start with: py main.py (reads this file)
+#
+# use_mock = true -> simulated drivers, no hardware needed
+# use_mock = false -> real hardware on the configured ports / DLL
+# =============================================================================
+
+[general]
+use_mock = false
+
+# -----------------------------------------------------------------------------
+# One shared dual EOM controller (one NI board) for the two assigned lasers.
+# It controls two channels; each laser receives its channel below:
+# channel = 0 -> EOM 1 (AO0 / AI0)
+# channel = 1 -> EOM 2 (AO1 / AI1)
+# -----------------------------------------------------------------------------
+[eom]
+board_idx = 1                   # (Mock) NI board index
+ini = "eom.ini"                 # (Hardware) [EOM1]/[EOM2] parameters; DLL bundled with eom_controller
+
+# -----------------------------------------------------------------------------
+# AWG (Spectrum M4i.6631-x8): pump/Stokes triggers and probe modulation.
+# Fixed card settings here; pump/Stokes phases, decay and probe controls in GUI.
+# -----------------------------------------------------------------------------
+[awg]
+device = "/dev/spcm0"           # Card device path
+samplerate_hz = 819200000       # 819.2 MS/s (from 12.8 MHz reference clock)
+reference_clock_hz = 12800000   # external reference clock (12.8 MHz)
+external_clock = false            # external reference clock instead of internal PLL
+external_trigger = false          # external trigger instead of software trigger
+trigger_level_mv = 1500          # external trigger threshold
+num_pulses = 10                 # pulses in the main train (aligned)
+amplitude_mv = 1000             # analog output amplitude (probe)
+analog_channel = 0              # analog channel = probe
+pump_line = 0                   # X0 -> pump trigger (BIT15)
+stokes_line = 1                 # X1 -> Stokes trigger (BIT14)
+trigger_line = 2                # X2 -> sync trigger (BIT13)
+# Initial GUI settings:
+pulse_frequency_hz = 51200000   # default pulse rate (dropdown: 6.4/12.8/25.6/51.2 MHz)
+pump_phase_samples = 0
+stokes_phase_samples = 0
+decay_time_us = 20.0
+probe_enabled = true
+# probe_pump_shift_samples omitted -> pump offset = half pulse period
+
+# -----------------------------------------------------------------------------
+# Laser 1: TEC Maiman driver -> Aerodiode driver
+# -----------------------------------------------------------------------------
+[[laser]]
+name = "1064 nm - PUMP"
+
+  [laser.apg]
+  port = "COM10"
+  mode = "usb"
+
+  [laser.eom]
+  channel = 0                   # EOM 1 (AO0 / AI0) of the shared controller
+
+  [[laser.stage]]
+  type = "maiman_tec"           # TEC Maiman driver (SF8150T)
+  name = "Stage 1"
+  port = "COM5"
+  serial = "0xFFFF"             # optional: expected serial number
+  current_max_a = 1.5           # software/model limit (SF8150 = 1.5 A)
+  diode_current_a = 1.5         # fixed diode current
+
+  [[laser.stage]]
+  type = "aerodiode"            # Aerodiode driver (MMD)
+  name = "Stage 2"
+  port = "COM3"
+  address = 1                   # optional: expected bus address
+  max_current_a = 5.5          # maximum current (upper bound of current input)
+  initial_current_a = 0.0       # adjustable initial current
+
+# -----------------------------------------------------------------------------
+# Laser 2: one Maiman driver without TEC
+# -----------------------------------------------------------------------------
+[[laser]]
+name = "1550 nm - STOKES"
+
+  [laser.apg]
+  port = "COM11"
+  mode = "usb"
+
+  [laser.eom]
+  channel = 1                   # EOM 2 (AO1 / AI1) of the shared controller
+
+  [[laser.stage]]
+  type = "maiman_notec"         # Maiman driver without TEC (SF6015)
+  name = "Stage 1"
+  port = "COM12"
+  serial = "0x0EE3"
+  max_current_a = 0.0          # maximum current (upper bound of current input)
+  initial_current_a = 0.0       # adjustable initial current
+
+# Additional SF8 laser: manual connection in the GUI, no guessed COM ports.
+# Serial numbers below are decimal integers: 4985 = 0x1379, 65535 = 0xFFFF.
+# Limits constrain software setpoints; they do not program hardware interlocks.
+[[laser]]
+name = "532 nm - PROBE"
+deferred_connect = false
+
+  [[laser.stage]]
+  type = "maiman_tec"
+  name = "Seed diode"
+  port = "COM15"
+  serial = "0x1347"
+  current_max_a = 0.5
+  initial_current_a = 0.49
+  adjustable_current = true
+
+  [[laser.stage]]
+  type = "maiman_tec"
+  name = "Pump diode"
+  port = "COM13"
+  serial = "0xFFFF"
+  current_max_a = 1.5
+  initial_current_a = 0.0
+  adjustable_current = true

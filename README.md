@@ -23,13 +23,18 @@ automatically as dependencies:
 | `spectrum_awg` | [spectrum_m4i_awg](https://github.com/AGKarpf/spectrum_m4i_awg) |
 
 ```powershell
-py -m pip install "laserlab-toolkit @ git+https://github.com/AGKarpf/LaserLab-Toolkit.git"
-# with the Spectrum card binding (spcm_core):
-py -m pip install "laserlab-toolkit[hardware] @ git+https://github.com/AGKarpf/LaserLab-Toolkit.git"
+py -m pip install https://github.com/AGKarpf/LaserLab-Toolkit/archive/refs/heads/main.zip
 ```
 
-Only Python and Git need to be installed; all drivers, PyQt6 and the EOM DLL
-come along automatically.
+Only Python (3.10 or newer) and internet access are needed: no Git and no
+GitHub account. All drivers, PyQt6 and the EOM DLL come along automatically.
+With the Spectrum card binding: `py -m pip install spcm_core` in addition.
+
+Update to the latest version:
+
+```powershell
+py -m pip install --upgrade --force-reinstall https://github.com/AGKarpf/LaserLab-Toolkit/archive/refs/heads/main.zip
+```
 
 `[hardware]` adds `spcm_core` for the Spectrum card (needs the native SPCM
 drivers). Development checkout: `py -m pip install -e .[test]`.

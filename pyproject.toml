@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "srp-controller"
+dynamic = ["version"]
+description = "SRP laser controller toolkit: diode chains (Maiman/Aerodiode), APG1780DA, dual EOM and Spectrum AWG with a plugin registry for building custom PyQt6 GUIs."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Christian Stock" }]
+dependencies = [
+    "PyQt6>=6.5,<7",
+    "pyserial>=3.5,<4",
+    "numpy>=1.24,<3",
+    "matplotlib>=3.7,<4",
+    "maiman-drivers[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/Maiman-Treiber-Software.git",
+    "aerodiode-driver[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/Aerodiode-Treiber-Software.git",
+    "apg1780da[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/apg1780da.git",
+    "eom-controller[gui] @ git+https://github.com/GITHUB_USER_PLACEHOLDER/EOM-Controller.git",
+    "spectrum-awg @ git+https://github.com/GITHUB_USER_PLACEHOLDER/spectrum_m4i_awg.git",
+]
+
+[project.optional-dependencies]
+# Spectrum card driver binding (needs the native SPCM drivers installed).
+hardware = ["spcm_core"]
+test = ["pytest>=7"]
+
+[project.gui-scripts]
+srp-controller = "srp_controller.__main__:main"
+
+[tool.setuptools]
+packages = ["srp_controller"]
+
+[tool.setuptools.dynamic]
+version = { attr = "srp_controller.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

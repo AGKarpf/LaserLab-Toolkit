@@ -74,10 +74,13 @@ def main(argv=None) -> int:
     lasers = load_lasers(config, force_mock=force_mock)
     awg = load_awg(config, force_mock=force_mock)
     connection_settings = None if args.mock else read_connection_settings(config)
+    with config.open("rb") as stream:
+        awg_configured = "awg" in tomllib.load(stream)   # show panel even if it failed
 
     from .gui import run
     title = "SRP Controller (Demo / simulated)" if args.mock else "SRP Controller"
-    return run(lasers, awg, title=title, connection_settings=connection_settings)
+    return run(lasers, awg, title=title, connection_settings=connection_settings,
+               show_awg=awg_configured)
 
 
 if __name__ == "__main__":

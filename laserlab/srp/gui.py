@@ -104,15 +104,21 @@ class CombinedWindow(QWidget):
 
     def __init__(self, lasers: Sequence[Laser],
                  awg: object = None,
-                 title: str = "SRP Controller", connection_settings=None) -> None:
+                 title: str = "SRP Controller", connection_settings=None,
+                 show_awg: bool | None = None) -> None:
+        """show_awg: show the AWG panel; default only when an AWG is given.
+        Pass True to show a configured AWG that failed to start (error state)."""
         super().__init__()
         self.setWindowTitle(title)
 
         outer = QVBoxLayout(self)
 
-        # Global AWG panel (pump/Stokes phase, decay, probe).
-        self.awg_panel = AwgPanel(awg)
-        outer.addWidget(self.awg_panel)
+        # Global AWG panel (pump/Stokes phase, decay, probe), only with an AWG.
+        if show_awg is None:
+            show_awg = awg is not None
+        self.awg_panel = AwgPanel(awg) if show_awg else None
+        if self.awg_panel is not None:
+            outer.addWidget(self.awg_panel)
 
         # Scrollable laser panels below.
         scroll = QScrollArea()
@@ -177,7 +183,8 @@ class CombinedWindow(QWidget):
         # --- AWG <-> laser coupling ---------------------------------------
         # AWG OFF -> lasers OFF and output switches locked.
         # Laser ON -> AWG stop locked (AWG must keep running).
-        self.awg_panel.on_running_changed = self._sync_awg_coupling
+        if self.awg_panel is not None:
+            self.awg_panel.on_running_changed = self._sync_awg_coupling
         for panel in self.panels:
             panel.chain_widget.on_change = self._sync_awg_coupling
         self._sync_awg_coupling()
@@ -211,12 +218,12 @@ class CombinedWindow(QWidget):
                 stage.driver.close()
             if panel.laser.apg is not None:
                 panel.laser.apg.close()
-        if self.awg_panel.controller is not None:
+        if self.awg_panel is not None and self.awg_panel.controller is not None:
             self.awg_panel.controller.close()
         event.accept()
 
     def _sync_awg_coupling(self) -> None:
-        if self.awg_panel.controller is None:
+        if self.awg_panel is None or self.awg_panel.controller is None:
             return                                    # no coupling without an AWG
         running = self.awg_panel.is_running()
         for panel in self.panels:
@@ -236,7 +243,8 @@ class CombinedWindow(QWidget):
 
 
 def run(lasers: Sequence[Laser], awg: object = None,
-        title: str = "SRP Controller", connection_settings=None) -> int:
+        title: str = "SRP Controller", connection_settings=None,
+        show_awg: bool | None = None) -> int:
     """Start the Qt application with the supplied devices or chains."""
     app = QApplication.instance() or QApplication([])
     from PyQt6.QtGui import QFont
@@ -377,6 +385,6 @@ def run(lasers: Sequence[Laser], awg: object = None,
     arrow_style = arrow_style.replace("DOWN_ICON", down_icon.as_posix())
     app.setStyleSheet(app.styleSheet() + arrow_style)
 
-    window = CombinedWindow(lasers, awg, title, connection_settings)
+    window = CombinedWindow(lasers, awg, title, connection_settings, show_awg)
     window.show()
     return app.exec()

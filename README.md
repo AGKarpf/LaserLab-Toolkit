@@ -53,6 +53,23 @@ In a development checkout, `py demo.py` / `py main.py` use the `config.toml`
 next to them. The packaged default lives in `laserlab/srp/defaults/`. Hardware
 mode requires the NI-DAQmx runtime (EOM) and the Spectrum drivers (AWG).
 
+### TEC temperature (Maiman SF8150-T)
+
+Each `maiman_tec` stage can set its TEC setpoint in `config.toml`; without the
+key it stays at 25 °C:
+
+```toml
+  [[laser.stage]]
+  type = "maiman_tec"
+  name = "Seed"
+  port = "COM5"
+  tec_temperature_c = 17.0      # 15-40 °C (SF8xxx datasheet range)
+```
+
+Values outside 15–40 °C are rejected when the configuration is loaded, before a
+port is opened. The GUI shows the target as "TEC target". Mind the dew point
+of the lab air at low setpoints. Aerodiode stages keep the fixed 25 °C.
+
 ## Using the components in your own GUI (plugin registry)
 
 Every device type and its PyQt6 widget is registered by kind and name and can
@@ -102,7 +119,7 @@ def register(registry):
 
 ## Additional SF8 laser
 
-| Control | Driver serial (decimal) | Software current limit | Initial current | TEC target |
+| Control | Driver serial (decimal) | Software current limit | Initial current | TEC target (default) |
 |---|---:|---:|---:|---:|
 | Seed diode | 4985 (`0x1379`) | 0.5 A (500 mA) | 0 A | 25 °C |
 | Pump diode | 65535 (`0xFFFF`) | 1.5 A | 0 A | 25 °C |
@@ -118,7 +135,8 @@ can start before the new ports are known:
 3. Tick the checkbox confirming that you identified both USB connections, then
    click **Connect seed and pump**.
 4. Both serial numbers are checked before control commands. Outputs are stopped,
-   currents initialized to zero, TECs started at 25 °C, and setpoints verified.
+   currents initialized to zero, TECs started at their target (`tec_temperature_c`,
+   default 25 °C), and setpoints verified.
    A mismatch or setup failure reports the error and keeps controls disconnected.
 5. Start the AWG as required by the existing gating logic. Set currents and enable
    the seed before the pump. Switch off the pump before the seed.

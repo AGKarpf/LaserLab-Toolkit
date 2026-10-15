@@ -22,4 +22,4 @@ __all__ = [
     "registry", "Registry", "ComponentType", "UnknownComponentError",
     "default_registry", "PLUGIN_GROUP",
 ]
-__version__ = "2.0.0"
+__version__ = "2.1.0"

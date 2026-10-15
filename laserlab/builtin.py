@@ -25,12 +25,15 @@ from eom_controller import DualEOMController, EomChannel, MockDualEOMController,
 
 from .srp.awg import AwgController, AwgSettings
 
-#: TEC setpoint for all TEC drivers: 25 °C.
+#: Default TEC setpoint: 25 °C (Maiman stages: tec_temperature_c overrides it).
 TEC_TEMPERATURE_C = 25.0
+#: Maiman SF8 TEC setpoint validation (15-40 °C), bound before any patching/port.
+_check_maiman_tec = SF8150T.check_tec_temperature
 
 
-def _activate_tec(drv, name: str, is_maiman: bool, use_mock: bool) -> None:
-    """Set the TEC to 25 °C immediately after connection and start it.
+def _activate_tec(drv, name: str, is_maiman: bool, use_mock: bool,
+                  temperature_c: float = TEC_TEMPERATURE_C) -> None:
+    """Set the TEC setpoint immediately after connection and start it.
     Maiman also requires internal temperature and enable sources. Each command
     is attempted independently with a 30 ms hardware delay; verify started state
     and retry once. Failures are reported without preventing later commands."""
@@ -43,7 +46,7 @@ def _activate_tec(drv, name: str, is_maiman: bool, use_mock: bool) -> None:
         except Exception as exc:
             print(f"{name}: TEC command '{what}' failed ({exc}).")
 
-    cmd(lambda: drv.set_tec_temperature(TEC_TEMPERATURE_C), "set_tec_temperature")
+    cmd(lambda: drv.set_tec_temperature(temperature_c), "set_tec_temperature")
     if is_maiman:
         cmd(lambda: drv.tec_set_source(internal=True), "tec_set_source")
         cmd(lambda: drv.tec_set_enable_source(internal=True), "tec_set_enable_source")
@@ -65,10 +68,16 @@ def _activate_tec(drv, name: str, is_maiman: bool, use_mock: bool) -> None:
 # ---------------------------------------------------------------------------
 def build_maiman_tec(stage: Mapping[str, Any], use_mock: bool):
     """SF8150-T with TEC. Keys: name, port, serial, current_max_a,
-    diode_current_a | initial_current_a, adjustable_current."""
+    diode_current_a | initial_current_a, adjustable_current,
+    tec_temperature_c (TEC setpoint, 15-40 °C, default 25 °C)."""
     name = stage.get("name", "maiman_tec")
     port = stage.get("port") or f"MOCK-{name}"
     current = float(stage.get("diode_current_a", stage.get("initial_current_a", 0.0)))
+    # Validate before any port is opened.
+    try:
+        tec_c = _check_maiman_tec(stage.get("tec_temperature_c", TEC_TEMPERATURE_C))
+    except ValueError as exc:
+        raise ValueError(f"Stage '{name}': {exc}") from None
     if use_mock:
         drv = MockSF8150T(port, serial_number=stage.get("serial", 0x0002),
                           current_max_a=stage.get("current_max_a"),
@@ -76,10 +85,10 @@ def build_maiman_tec(stage: Mapping[str, Any], use_mock: bool):
     else:
         drv = SF8150T(port, current_max_a=stage.get("current_max_a"),
                       expected_serial=stage.get("serial"))
-    # Activate TEC at connection (25 °C), before initialize().
-    _activate_tec(drv, name, is_maiman=True, use_mock=use_mock)
+    # Activate TEC at connection with the configured setpoint, before initialize().
+    _activate_tec(drv, name, is_maiman=True, use_mock=use_mock, temperature_c=tec_c)
     stage_class = AdjustableTecLaserStage if stage.get("adjustable_current") else TecLaserStage
-    return stage_class(name, drv, current)
+    return stage_class(name, drv, current, tec_temperature_c=tec_c)
 
 
 def build_aerodiode(stage: Mapping[str, Any], use_mock: bool):

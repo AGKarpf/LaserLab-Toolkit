@@ -61,6 +61,7 @@ name = "1064 nm - PUMP"
 
   [[laser.stage]]
   type = "maiman_tec"           # TEC Maiman driver (SF8150T)
+  # tec_temperature_c = 25.0     # TEC setpoint in °C (15–40, default 25)
   name = "Stage 1"
   port = "COM5"
   serial = "0xFFFF"             # optional: expected serial number
@@ -105,6 +106,7 @@ deferred_connect = false
 
   [[laser.stage]]
   type = "maiman_tec"
+  # tec_temperature_c = 25.0     # TEC setpoint in °C (15–40, default 25)
   name = "Seed diode"
   port = "COM15"
   serial = "0x1347"
@@ -114,6 +116,7 @@ deferred_connect = false
 
   [[laser.stage]]
   type = "maiman_tec"
+  # tec_temperature_c = 25.0     # TEC setpoint in °C (15–40, default 25)
   name = "Pump diode"
   port = "COM13"
   serial = "0xFFFF"

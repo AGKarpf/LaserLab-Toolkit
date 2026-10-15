@@ -17,6 +17,9 @@ from pathlib import Path
 
 from serial.tools import list_ports
 from maiman_drivers import SF8150T
+
+#: TEC setpoint validation (15-40 °C), bound once so it never opens a port.
+_check_tec_temperature = SF8150T.check_tec_temperature
 from maiman_drivers.laser import AdjustableTecLaserStage, LaserChain
 from ..laser import Laser
 
@@ -92,6 +95,8 @@ def connect_laser(definition, ports, reserved_ports=()):
             raise ValueError("SF8150-T current limits must be greater than 0 and at most 1.5 A.")
         if stage.get("type") != "maiman_tec" or not stage.get("adjustable_current"):
             raise ValueError("Deferred connections require adjustable SF8 TEC stages.")
+    temperatures = [_check_tec_temperature(s.get("tec_temperature_c", 25.0))
+                    for s in stages]
     drivers = []
     configuring = False
     try:
@@ -102,16 +107,16 @@ def connect_laser(definition, ports, reserved_ports=()):
         for driver in drivers:
             driver.stop()
         chain = LaserChain(definition['name'], [
-            AdjustableTecLaserStage(stage["name"], driver, 0.0)
-            for stage, driver in zip(stages, drivers)
+            AdjustableTecLaserStage(stage["name"], driver, 0.0, tec_temperature_c=celsius)
+            for stage, driver, celsius in zip(stages, drivers, temperatures)
         ])
         laser = Laser(definition["name"], chain, apg=None, eom=None)
         laser.initialize()
-        for driver in drivers:
+        for driver, celsius in zip(drivers, temperatures):
             if driver.read_state()["started"]:
                 raise RuntimeError("Diode output did not stop.")
-            if abs(driver.get_tec_temperature_setpoint() - 25.0) > 0.02:
-                raise RuntimeError("TEC setpoint verification failed (expected 25 °C).")
+            if abs(driver.get_tec_temperature_setpoint() - celsius) > 0.02:
+                raise RuntimeError(f"TEC setpoint verification failed (expected {celsius:g} °C).")
             if not driver.read_tec_state()["started"]:
                 raise RuntimeError("TEC did not start.")
             if abs(driver.get_current_setpoint()) > driver.CURRENT_SET_STEP_A:

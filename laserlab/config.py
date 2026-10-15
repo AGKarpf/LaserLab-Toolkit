@@ -40,6 +40,8 @@ def _build_stage(stage: dict, use_mock: bool, registry: Optional[Registry] = Non
         return _registry(registry).build("stage", typ, stage, use_mock)
     except UnknownComponentError as exc:
         raise ConfigError(f"{exc} (stage '{name}').") from None
+    except ValueError as exc:                        # invalid parameter value
+        raise ConfigError(str(exc)) from None
 
 
 def _build_apg(cfg: Optional[dict], use_mock: bool, registry: Optional[Registry] = None):

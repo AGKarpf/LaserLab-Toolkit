@@ -88,7 +88,8 @@ class ConnectionPanel(QGroupBox):
         for control in [*self.combos, self.refresh_btn, self.confirm]:
             control.setEnabled(False)
         self.connect_btn.setText("Connected")
-        self.status.setText("Connected — outputs OFF, currents 0 A, TEC targets 25 °C")
+        targets = ", ".join(f"{s.tec_temperature_c:g}" for s in laser.chain.stages)
+        self.status.setText(f"Connected — outputs OFF, currents 0 A, TEC targets {targets} °C")
         try:
             save_ports(self.settings_path, self.definition["name"], ports)
         except OSError as exc:
